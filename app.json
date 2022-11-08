@@ -24,7 +24,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.whee33.ProgrammingMemes"
     },
     "web": {
       "favicon": "./assets/favicon.png"

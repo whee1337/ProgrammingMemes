@@ -9,12 +9,21 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@react-native-async-storage/async-storage": "^1.17.10",
+    "axios": "^1.1.3",
     "expo": "~46.0.16",
     "expo-status-bar": "~1.4.0",
+    "expo-updates": "~0.14.6",
     "react": "18.0.0",
     "react-dom": "18.0.0",
     "react-native": "0.69.6",
-    "react-native-web": "~0.18.7"
+    "react-native-paper": "5.0.0-rc.9",
+    "react-native-scroll-lazy": "^1.0.1",
+    "react-native-vector-icons": "^9.2.0",
+    "react-native-web": "~0.18.7",
+    "styled-components": "^5.3.6"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
