@@ -3,10 +3,11 @@ import React from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
 import MemeListView from './components/MemeListView';
 import { BottomNavigation } from 'react-native-paper';
+import FavoriteMemesList from './components/FavoriteMemesList';
 
 export default function App() {
   const ListRoute = () => <MemeListView></MemeListView>;
-  const FavRoute = () => <MemeListView></MemeListView>;
+  const FavRoute = () => <FavoriteMemesList></FavoriteMemesList>;
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([

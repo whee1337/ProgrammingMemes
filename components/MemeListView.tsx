@@ -3,97 +3,77 @@ import useMemes from '../hooks/useMemes';
 import { Meme } from '../models/Meme';
 import { FlatList, Image, View, Share, AsyncStorage} from 'react-native';
 import { Dimensions } from 'react-native';
-import { Button,IconButton } from 'react-native-paper';
+import { Button,IconButton,Snackbar } from 'react-native-paper';
+import MemeComponent from './MemeComponent';
 
 
 
 export default function MemeListView() {
     const [memeList, setMemes] = useState<Meme[]>([]);
-    const windowWidth = Dimensions.get('window').width;
-    const windowHeihgt = Dimensions.get('window').height;
+    const [visible, setVisible] = useState(false);
+    const [favorites, setFavorites] = useState<Meme[]>([]);
 
     const memes = useMemes();
+          
+    const readFavorites = () => {
+            return  AsyncStorage.getItem('FAVS');
+      };
 
-    useEffect(()=>{
-        memes.then((response)=> setMemes(response.data))
-    },[])
-    
-    const storeFavorites = async () => {
+      const storeFavorites = async (memeList: Meme[]) => {
         try {
           await AsyncStorage.setItem(
-            'FAV',
-            'I like to save it.'
+            'FAVS',
+            JSON.stringify(memeList)
           );
         } catch (error) {
           // Error saving data
         }
       };
-    
-      const readFavorites = async () => {
-        console.log("Read")
-        try {
-          const value = await AsyncStorage.getItem('FAV');
-          if (value !== null) {
-            // We have data!!
-            console.log(value);
-          }
-        } catch (error) {
-          // Error retrieving data
-        }
-      };
-    const onShare = async (item: Meme) => {
-        try {
-          const result = await Share.share({
-            message:
-              'React Native | A framework for building native apps using React ' + item.link,
-          });
-          if (result.action === Share.sharedAction) {
-            if (result.activityType) {
-              // shared with activity type of result.activityType
-            } else {
-              // shared
-            }
-          } else if (result.action === Share.dismissedAction) {
-            // dismissed
-          }
-        } catch (error) {
-          alert(error.message);
-        }
-      };
 
     useEffect(()=>{
-        storeFavorites();
-        console.log("STORED")
-    }, [])
+        readFavorites().then((response)=> {
+            if(!response)
+            {
+                setFavorites([]);
+                return;
+            }
+
+            const value:string = response ?? "";
+            const parsedList: Meme[] = JSON.parse(value);
+            setFavorites(parsedList);
+        }).catch((e) => console.log(e))
+    },[])
+
+    useEffect(()=>{
+        memes.then((response)=> setMemes(response.data))
+    },[])
+
+    const addToFavorites = (meme:Meme) => {
+        setFavorites((prevValue) => {
+            storeFavorites([...prevValue,meme]);
+            return [...prevValue,meme];
+        })
+        setVisible(true);
+        setTimeout(() => setVisible(false), 2500);
+  }
+
     const renderItem = ({ item }:any) => {
         return(
-            <View style={{width:windowWidth, height:windowHeihgt/2 -2,  borderColor:"#D0D0D0",borderWidth:1}}>  
-                <Image
-                style={{width:"100%", height:"85%",resizeMode:"contain"}}
-                source={{
-                uri: item.link,
-                }}
-                />
-                <View style={{display:"flex", justifyContent:"flex-end", flexDirection: "row", marginRight:5}}>
-                <IconButton     
-                    icon="heart"
-                    size={20}
-                    onPress={() => readFavorites()}> 
-                </IconButton>
-                <IconButton     
-                    icon="share-variant"
-                    size={20}
-                    onPress={() => onShare(item)}> 
-                </IconButton>
-                </View>
-          </View>
+            <MemeComponent meme={item} onFavClicked={addToFavorites} />
         )
     }
 
-    return (<FlatList style={{ flex:1, margin:10, paddingBottom: 3}} data={memeList}
+    return (<><FlatList style={{ flex:1, margin:10, paddingBottom: 3}} data={memeList}
         renderItem={renderItem}
         keyExtractor={item => item.link + Math.random()}>
-       </FlatList>)
+       </FlatList>
+       <Snackbar
+        visible={visible}
+        onDismiss={() => { setVisible(false)}}>
+        Zu Favoriten hinzugefügt! 
+      </Snackbar>
+      </>
+       )
 }
 
 /*
